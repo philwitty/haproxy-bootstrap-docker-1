@@ -36,8 +36,10 @@ if not os.path.isdir('/bootstrap'):
         os.mkdir('/bootstrap')
 with open('/bootstrap/key.pem', 'wb') as key:
     key.write(get_object('certificate-authority.pem'))
-with open('/bootstrap/cert.pem', 'wb') as cert:
+with open('/bootstrap/certificate.pem', 'wb') as cert:
     cert.write(get_object('certificate.pem'))
+with open('/bootstrap/server-certificate-chain.pem', 'wb') as chain:
+    chain.write(get_object('server-certificate-chain.pem'))
 with open('/bootstrap/config.cfg', 'wb') as config:
     config.write(get_object('config.cfg'))
 with open('/bootstrap/haproxy.cfg', 'wb') as config:
@@ -45,11 +47,13 @@ with open('/bootstrap/haproxy.cfg', 'wb') as config:
 
 parser = configparser.ConfigParser()
 parser.read('/bootstrap/config.cfg')
-passphrase = parser['HAPROXY']['passphrase']
+passphrase = parser['SSL']['rsa_passphrase']
 if 'client_validation' in parser['HAPROXY']:
-    with open('/bootstrap/chain.pem', 'wb') as chain:
-        chain.write(get_object('certificate-chain.pem'))
+    with open('/bootstrap/client-certificate-chain.pem', 'wb') as chain:
+        chain.write(get_object('client-certificate-chain.pem'))
+
+# haproxy doesn't support key with passprhase so remove it
 subprocess.call(['openssl rsa -in /bootstrap/key.pem -passin pass:' + passphrase + ' -out /bootstrap/key.pem'], shell=True)
 
 # haproxy crt requires Cert -> Key -> Chain
-subprocess.call(['cat /bootstrap/cert.pem /bootstrap/key.pem /bootstrap/chain.pem > /bootstrap/server_cert.pem'], shell=True)
+subprocess.call(['cat /bootstrap/certificate.pem /bootstrap/key.pem /bootstrap/server-certificate-chain.pem > /bootstrap/server_cert.pem'], shell=True)
