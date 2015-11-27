@@ -1,13 +1,15 @@
-FROM haproxy:1.5
+FROM haproxy:1.6
 
 RUN apt-get update && \
     apt-get install -y \
+        git \
         openssl \
-        python3 && \
+        python3 \
+        python3-pip && \
     apt-get clean
-ADD https://bootstrap.pypa.io/get-pip.py /get-pip.py
-RUN python3 get-pip.py && rm /get-pip.py
-RUN pip install boto3
+RUN pip-3.2 install \
+    pyyaml==3.11 \
+    git+git://github.com/curoo/expend-python-commons.git@master#egg=ex_py_commons
 
 ADD bootstrap.py /bootstrap/bootstrap.py
 
