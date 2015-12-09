@@ -25,9 +25,9 @@ with open(cert_path, 'wb') as cert:
     cert.write(read_file_from_url(url, aws_session=session))
 key_path = '/bootstrap/key.pem'
 with open(key_path, 'wb') as key:
-    url = config['SSL']['server_certificate_authority']
+    url = config['SSL']['server_key']
     key.write(read_file_from_url(url, aws_session=session))
-passphrase = config['SSL']['server_certificate_authority_passphrase']
+passphrase = config['SSL']['server_key_passphrase']
 
 # haproxy doesn't support key with passprhase so remove it
 subprocess.call(['openssl', 'rsa', '-in', key_path,
