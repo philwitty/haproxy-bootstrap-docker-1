@@ -1,4 +1,3 @@
 review:
-	@pyflakes .
-	@pep8 .
+	@flake8 .
 .PHONY: review

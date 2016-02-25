@@ -1,5 +1,6 @@
 import os
 from subprocess import check_call
+from urllib.parse import urlparse
 import yaml
 from ex_py_commons.session import boto_session
 from ex_py_commons.file import read_file_from_url, \
@@ -22,6 +23,8 @@ with open(key_path, 'wb') as f:
     url = config['SSL']['server_key']
     f.write(read_file_from_url(url, aws_session=session))
 passphrase = config['SSL']['server_key_passphrase']
+if urlparse(passphrase).scheme != '':
+    passphrase = read_file_from_url(passphrase, aws_session=session).decode()
 
 # haproxy doesn't support key with passprhase so remove it
 check_call(['openssl', 'rsa', '-in', key_path,
